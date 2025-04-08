@@ -4,7 +4,8 @@ import { adminService } from "./admin.service";
 
 
 const getAllAdmins = async(req:Request,res:Response)=>{
-const result = await adminService.getAllAdminService();
+    const params = req.query;
+const result = await adminService.getAllAdminService(params);
 res.status(200).json({
     success:true,
     message:"Admin all data retrived successfully",
