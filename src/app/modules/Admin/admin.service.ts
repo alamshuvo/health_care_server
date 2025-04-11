@@ -9,6 +9,9 @@ const getAllAdminService = async (params: any,options:any) => {
   const {limit, page,skip} = calculatePagination(options);
   const {searchTerm,...filterData}= params;
   const andConditions:Prisma.AdminWhereInput[] = [];
+
+
+  // some code added 
   // [
   //   {
   //     name: {
