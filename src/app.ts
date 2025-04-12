@@ -14,5 +14,6 @@ app.get('/',(req:Request,res:Response)=>{
         Message:"Health care Server..."
     })
 })
+app.use('/api/v1/user',userRoutes)
 app.use('/api/v1/admin',adminRoutes)
 export default app ;
