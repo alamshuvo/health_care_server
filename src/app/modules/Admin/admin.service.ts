@@ -3,15 +3,12 @@ import { adminSearchAbleFields } from "./admin.const";
 import { calculatePagination } from "../../../helpers/pagination.helper";
 import { prisma } from "../../../shared/prisma";
 
+const getAllAdminService = async (params: any, options: any) => {
+  const { limit, page, skip } = calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+  const andConditions: Prisma.AdminWhereInput[] = [];
 
-
-const getAllAdminService = async (params: any,options:any) => {
-  const {limit, page,skip} = calculatePagination(options);
-  const {searchTerm,...filterData}= params;
-  const andConditions:Prisma.AdminWhereInput[] = [];
-
-
-  // some code added 
+  // some code added
   // [
   //   {
   //     name: {
@@ -35,14 +32,14 @@ const getAllAdminService = async (params: any,options:any) => {
 
   if (params.searchTerm) {
     andConditions.push({
-      OR:adminSearchAbleFields.map((field)=>{
-        return{
-          [field]:{
-            contains:params.searchTerm,
-            mode:'insensitive',
-          }
-        }
-      })
+      OR: adminSearchAbleFields.map((field) => {
+        return {
+          [field]: {
+            contains: params.searchTerm,
+            mode: "insensitive",
+          },
+        };
+      }),
     });
   }
   if (Object.keys(filterData).length > 0) {
@@ -50,34 +47,46 @@ const getAllAdminService = async (params: any,options:any) => {
       AND: Object.keys(filterData).map((key) => ({
         [key]: {
           equals: filterData[key],
-       
         },
       })),
     });
   }
-  
-  const whereConditions:Prisma.AdminWhereInput = {
+
+  const whereConditions: Prisma.AdminWhereInput = {
     AND: andConditions,
   };
   const result = await prisma.admin.findMany({
     where: whereConditions,
     skip,
     take: limit,
-    orderBy: options.sortBy && options.sortOrder ? {
-      [options.sortBy]: options.sortOrder
-    }:{
-      createdAt: 'desc',
-    }
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
   });
-  return result;
+  const total = await prisma.admin.count({
+    where:whereConditions
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+
+    },
+    data:result,
+  };
 };
 export const adminService = {
   getAllAdminService,
 };
 
-
 /**
- * data = 1 2 3 4 5 6 7 8 
+ * data = 1 2 3 4 5 6 7 8
  * page = 2
  * limit = 3
  * skip = 3
