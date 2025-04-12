@@ -37,8 +37,19 @@ const updateAdmin = async (req: Request, res: Response) => {
   })
 }
 
+const deleteAdmin = async(req:Request,res:Response)=>{
+  const {id} = req.params;
+  const result = await adminService.deleteAdmin(id);
+  res.status(200).json({
+    success: true,
+    message: "Admin data deleted successfully",
+    data: result,
+  })
+}
+
 export const adminController = {
   getAllAdmins,
   getSingleAdmin,
-  updateAdmin
+  updateAdmin,
+  deleteAdmin
 };
