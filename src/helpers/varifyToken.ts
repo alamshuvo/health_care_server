@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken'
-const verifyToken = (token:string,secret:string)=>{
-const decodedData = jwt.verify(token,secret);
+import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
+const verifyToken = (token:string,secret:Secret)=>{
+const decodedData = jwt.verify(token,secret)as JwtPayload;
 return decodedData
 }
 
