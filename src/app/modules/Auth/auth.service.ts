@@ -1,6 +1,8 @@
 import { prisma } from "../../../shared/prisma";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import generateToken from "../../../helpers/generateToken";
+
 const loginUser = async (payload: { email: string; password: string }) => {
   //check is user data exist
   const userData = await prisma.user.findUniqueOrThrow({
@@ -14,26 +16,39 @@ const loginUser = async (payload: { email: string; password: string }) => {
     userData.password
   );
   if (!isCorrectPassword) {
-    throw new Error("password incorect")
+    throw new Error("password incorect");
   }
   const jwtPayload = {
     email: userData.email,
     role: userData.role,
   };
-  const accessToken = jwt.sign(jwtPayload, "abcdefg", {
-    expiresIn: "5m",
-    algorithm: "HS256",
-  });
- const refreshToken = jwt.sign(jwtPayload, "abcdefgdffffffsfsadrrerer", {
-    expiresIn: "30d",
-    algorithm: "HS256",
-  });
+  const accessToken = generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+    },
+    "abcdefg",
+    "5m"
+  );
+  const refreshToken = generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+    },
+    "abcdefgadfdfsf",
+    "30d"
+  );
   return {
     accessToken,
-    needsPasswordChange:userData.needPasswordChange,
-    refreshToken
+    needsPasswordChange: userData.needPasswordChange,
+    refreshToken,
   };
 };
+
+const refreshToken =async(token:string)=>{
+ console.log(token);
+}
 export const authService = {
   loginUser,
+  refreshToken
 };
