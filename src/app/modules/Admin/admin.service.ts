@@ -113,7 +113,7 @@ const updateAdmin = async (id: string, data: Partial<Admin>):Promise<Admin> => {
  })
   return result;
 }
-
+// some code added
 const deleteAdmin = async (id: string):Promise<Admin> => {
   await prisma.admin.findUniqueOrThrow({
     where:{id}
