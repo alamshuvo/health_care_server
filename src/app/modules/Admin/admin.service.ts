@@ -53,7 +53,7 @@ const getAllAdminService = async (params: IAdminFilterRequest, options: IOptions
       })),
     });
   }
-
+ // some code added 
   andConditions.push({
     isDeleted: false,
   })
