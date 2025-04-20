@@ -87,6 +87,7 @@ const changePassword = async (
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: user.email,
+      status: userStatus.ACTIVE,
     },
   });
   const isCorrectPassword = await bcrypt.compare(
