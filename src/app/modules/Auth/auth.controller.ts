@@ -14,24 +14,36 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     message: "log in sucessfully",
     data: {
-        accessToken:result.accessToken,
-        needPasswordChange:result.needsPasswordChange
+      accessToken: result.accessToken,
+      needPasswordChange: result.needsPasswordChange,
     },
   });
 });
 
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken } = req.cookies;
+  const result = await authService.refreshToken(refreshToken);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "Logged in successfully",
+    data: result,
+  });
+});
 
-const refreshToken = catchAsync(async(req:Request,res:Response)=>{
-    const {refreshToken}=req.cookies;
-    const result = await authService.refreshToken(refreshToken);
-  sendResponse(res,{
-    statusCode:status.OK,
-    success:true,
-    message:"Logged in successfully",
-    data:result
-  })
-})
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user
+  const newPassword = req.body;
+  const result = await authService.changePassword(user,newPassword);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "changed password successfully",
+    data: result,
+  });
+});
 export const authController = {
   loginUser,
-  refreshToken
+  refreshToken,
+  changePassword
 };

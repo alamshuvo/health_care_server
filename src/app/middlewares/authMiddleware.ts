@@ -15,6 +15,8 @@ const auth = (...role: string[]) => {
         token as string,
         config.jwt.jwtAccessToken as string
       );
+    
+      req.user = varifiedUser;
       if (role.length && !role.includes(varifiedUser.role)) {
         throw new ApiError(status.FORBIDDEN, "you are not authorized");
       }

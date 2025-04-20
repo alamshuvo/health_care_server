@@ -1,6 +1,6 @@
 import { prisma } from "../../../shared/prisma";
 import * as bcrypt from "bcrypt";
-import  { JwtPayload, Secret } from "jsonwebtoken";
+import { JwtPayload, Secret } from "jsonwebtoken";
 import generateToken from "../../../helpers/generateToken";
 import verifyToken from "../../../helpers/varifyToken";
 import { userStatus } from "@prisma/client";
@@ -11,7 +11,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
-      status:userStatus.ACTIVE
+      status: userStatus.ACTIVE,
     },
   });
   // check is password correct
@@ -52,16 +52,19 @@ const loginUser = async (payload: { email: string; password: string }) => {
 const refreshToken = async (token: string) => {
   let decodedData;
   try {
-    decodedData = verifyToken(token, config.jwt.refreshTokenSecret as Secret) as JwtPayload;
+    decodedData = verifyToken(
+      token,
+      config.jwt.refreshTokenSecret as Secret
+    ) as JwtPayload;
   } catch (error) {
     throw new Error("you are not authorized");
   }
   const userData = await prisma.user.findUniqueOrThrow({
-    where:{
-        email:decodedData?.email,
-        status:userStatus.ACTIVE
-    }
-  })
+    where: {
+      email: decodedData?.email,
+      status: userStatus.ACTIVE,
+    },
+  });
   const accessToken = generateToken(
     {
       email: userData.email,
@@ -74,9 +77,44 @@ const refreshToken = async (token: string) => {
     accessToken,
     needsPasswordChange: userData.needPasswordChange,
     refreshToken,
-  }; 
+  };
+};
+
+const changePassword = async (
+  user,
+  payload: { oldPassword: string; newPassword: string }
+) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+    },
+  });
+  const isCorrectPassword = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+  if (!isCorrectPassword) {
+    throw new Error("password incorect");
+  }
+  const hashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt.bacryptSaltRound)
+  );
+  await prisma.user.update({
+    where:{
+      email:userData.email
+    },
+    data:{
+      password:hashedPassword,
+      needPasswordChange:false
+    }
+  })
+  return {
+    message: "password changed successfully",
+  };
 };
 export const authService = {
   loginUser,
   refreshToken,
+  changePassword,
 };

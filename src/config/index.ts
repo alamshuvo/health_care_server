@@ -9,5 +9,9 @@ export default {
     jwtExpiresIn: process.env.JWT_EXPIRATION,
     refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
     refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
+   
   },
+ bcrypt:{
+    bacryptSaltRound: process.env.BCRYPT_SALT_ROUNDS,
+ }
 };
