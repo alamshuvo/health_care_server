@@ -13,5 +13,9 @@ export default {
   },
  bcrypt:{
     bacryptSaltRound: process.env.BCRYPT_SALT_ROUNDS,
+ },
+ resetPasswordCredential:{
+    resetPasswordSecret: process.env.RESET_PASSWORD_TOKEN,
+    resetTokenExpireIn: process.env.RESET_EXPIRES_IN,
  }
 };
