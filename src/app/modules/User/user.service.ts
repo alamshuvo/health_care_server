@@ -45,7 +45,54 @@ const createDoctor = async (req: any) => {
   });
   return result;
 };
+
+const getMyProfile = async (user: any) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+    },
+    select:{
+      id:true,email:true,role:true,needPasswordChange:true,status:true
+    }
+  });
+  let profileInfo;
+  if (userInfo.role === userRole.SUPER_ADMIN) {
+    profileInfo = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+  else if(userInfo.role === userRole.ADMIN){
+    profileInfo = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+    
+  }
+  else if(userInfo.role === userRole.DOCTOR){
+    profileInfo = await prisma.doctor.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+    
+  }
+
+
+  // else if(userInfo.role === userRole.PATIENT){
+  //   profileInfo = await prisma.doctor.findUnique({
+  //     where: {
+  //       email: userInfo.email,
+  //     },
+  //   });
+    
+  // }
+  return {...userInfo,...profileInfo};
+};
 export const userService = {
   createAdmin,
   createDoctor,
+  getMyProfile,
 };

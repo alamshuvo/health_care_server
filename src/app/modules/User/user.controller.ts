@@ -27,7 +27,20 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+const user = req.user;
+  const result = await userService.getMyProfile(user);
+  sendResponse(res, {
+    statusCode: status.CREATED,
+    success: true,
+    message: "My Profile data fetched successfully",
+    data: result,
+  });
+});
+
 export const userController = {
   createAdmin,
   createDoctor,
+  getMyProfile
 };

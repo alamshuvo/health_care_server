@@ -6,7 +6,8 @@ import { fileUploader } from "../../../helpers/fileUploader";
 import { userValidation } from "./user.validation";
 
 const router = express.Router();
-
+//get my profile 
+router.get("/me",auth(userRole.SUPER_ADMIN,userRole.ADMIN,userRole.DOCTOR,userRole.PATIENT),userController.getMyProfile)
 router.post(
   "/create-admin",
   auth(userRole.ADMIN, userRole.SUPER_ADMIN),
@@ -26,7 +27,5 @@ router.post(
     return userController.createDoctor(req, res, next);
   }
 );
-// some code realted issue 
-
 
 export const userRoutes = router;
