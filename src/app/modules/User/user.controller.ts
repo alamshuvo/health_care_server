@@ -39,8 +39,21 @@ const user = req.user;
   });
 });
 
+
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+    const result = await userService.updateMyProfile(user,req.body);
+    sendResponse(res, {
+      statusCode: status.CREATED,
+      success: true,
+      message: "My Profile updated successfully",
+      data: result,
+    });
+  });
+
 export const userController = {
   createAdmin,
   createDoctor,
-  getMyProfile
+  getMyProfile,
+  updateMyProfile
 };
