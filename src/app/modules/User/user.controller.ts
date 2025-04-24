@@ -4,18 +4,30 @@ import sendResponse from "../../../helpers/sendResponse.helper";
 import catchAsync from "../../../helpers/catchAsync";
 import status from "http-status";
 
-const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const data = req.body;
-    const result = await userService.createAdmin(data);
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "Admin created successfully",
-      data: result,
-    });
-  } catch (error) {}
-};
+// const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const data = req.body;
+//     console.log(req.body.data);
+//     const result = await userService.createAdmin(data);
+//     sendResponse(res, {
+//       statusCode: 200,
+//       success: true,
+//       message: "Admin created successfully",
+//       data: result,
+//     });
+//   } catch (error) {}
+// };
+
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.createAdmin(req);
+  sendResponse(res, {
+    statusCode: status.CREATED,
+    success: true,
+    message: "Admin  created successfully",
+    data: result,
+  });
+});
+
 
 const createDoctor = catchAsync(async (req: Request, res: Response) => {
   const result = await userService.createDoctor(req);

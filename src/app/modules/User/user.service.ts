@@ -5,10 +5,19 @@ import { fileUploader } from "../../../helpers/fileUploader";
 import { Request } from "express";
 import { IAuthUser } from "../../interfaces/common";
 
-const createAdmin = async (data: any) => {
-  const hashedPassword: string = await bcrypt.hash(data.password, 15);
+const createAdmin = async (req:Request) => {
+
+const file = req.file;
+if (file) {
+  const uploadToCloudinary = await fileUploader.uploadToCloudinary(file)
+  console.log(uploadToCloudinary,"uploaded");
+  req.body.admin.profilePhoto = uploadToCloudinary?.secure_url;
+  console.log(req.body,"upload to cloudinary tekhe asar por");
+}
+
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 15);
   const userPayload = {
-    email: data.admin.email,
+    email: req.body.admin.email,
     password: hashedPassword,
     role: userRole.ADMIN,
   };
@@ -17,11 +26,11 @@ const createAdmin = async (data: any) => {
       data: userPayload,
     });
     const creataedAdminData = await tx.admin.create({
-      data: data.admin,
+      data: req.body.admin,
     });
     return creataedAdminData;
   });
-  return result;
+
 };
 
 const createDoctor = async (req: any) => {

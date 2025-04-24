@@ -23,5 +23,11 @@ export default {
     GooglePassword: process.env.SEND_MAIL_PASSWORD,
     GoogleEmail: process.env.SEND_MAIL_EMAIL,
     
+ },
+ cloudinary:{
+   cloudinaryName:process.env.CLOUDINARY_NAME,
+   cloduninaryKey:process.env.CLOUDINARY_API_KEY,
+   cloudinarySecret:process.env.CLOUDINARY_SECRET,
+   cloudinaryURL: process.env.CLOUDINARY_URL
  }
 };
