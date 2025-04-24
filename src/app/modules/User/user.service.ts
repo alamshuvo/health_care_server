@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
 import { fileUploader } from "../../../helpers/fileUploader";
 import { Request } from "express";
+import { IAuthUser } from "../../interfaces/common";
 
 const createAdmin = async (data: any) => {
   const hashedPassword: string = await bcrypt.hash(data.password, 15);
@@ -93,10 +94,10 @@ const getMyProfile = async (user: any) => {
   return { ...userInfo, ...profileInfo };
 };
 
-const updateMyProfile = async (user: any, req:Request) => {
+const updateMyProfile = async (user:IAuthUser, req:Request) => {
   const isUserExist = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: userStatus.ACTIVE,
     },
   });
