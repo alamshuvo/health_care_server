@@ -3,6 +3,7 @@ import { fileUploader } from "../../../helpers/fileUploader";
 import { IFile } from "../../interfaces/file";
 import { prisma } from "../../../shared/prisma";
 
+
 const createSpecialities = async(req:Request)=>{
  const file = req.file as IFile;
  if (file) {
@@ -15,6 +16,29 @@ const createSpecialities = async(req:Request)=>{
  return result;
 }
 
+
+const getSpecialities = async() => {
+    const result =  await prisma.specialties.findMany({
+    })
+    return result
+}
+
+const deleteSpecialitiesById = async(id:string) => {
+ const SpecialitiesExist = await prisma.specialties.findUniqueOrThrow({
+    where:{
+        id
+    }
+ })
+ await prisma.specialties.delete({
+    where:{
+        id
+    }
+ })
+ return SpecialitiesExist
+}
 export const specialitiesService = {
-    createSpecialities
+    createSpecialities,
+    getSpecialities,
+    deleteSpecialitiesById
+
 }

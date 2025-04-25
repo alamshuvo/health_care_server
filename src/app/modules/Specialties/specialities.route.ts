@@ -14,5 +14,7 @@ router.post(
     return specialtiesController.createSpecialities(req, res, next);
   }
 );
+router.get("/specialties",specialtiesController.getSpecialities);
+router.delete("/:id",specialtiesController.deleteSpecilitiesById)
 
 export const specialtyRoutes = router;
