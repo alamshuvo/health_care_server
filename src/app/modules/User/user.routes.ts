@@ -6,7 +6,14 @@ import { fileUploader } from "../../../helpers/fileUploader";
 import { userValidation } from "./user.validation";
 
 const router = express.Router();
+
+router.get(
+  "/",
+  auth(userRole.ADMIN, userRole.SUPER_ADMIN),
+  userController.getAllUsers
+);
 //get my profile 
+
 router.get("/me",auth(userRole.SUPER_ADMIN,userRole.ADMIN,userRole.DOCTOR,userRole.PATIENT),userController.getMyProfile)
 router.post(
   "/create-admin",
@@ -27,6 +34,16 @@ router.post(
     return userController.createDoctor(req, res, next);
   }
 );
+
+router.post(
+  "/create-patient",
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = userValidation.createDoctor.parse(JSON.parse(req.body.data));
+    return userController.createPatient(req, res, next);
+  }
+);
+
 
 
 router.patch(

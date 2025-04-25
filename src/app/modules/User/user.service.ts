@@ -1,13 +1,17 @@
-import { PrismaClient, userRole, userStatus } from "@prisma/client";
+import { Admin, Doctor, Prisma, PrismaClient, userRole, userStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
 import { fileUploader } from "../../../helpers/fileUploader";
 import { Request } from "express";
 import { IAuthUser } from "../../interfaces/common";
+import { IFile } from "../../interfaces/file";
+import { IOptions } from "../../interfaces/pagination";
+import { calculatePagination } from "../../../helpers/pagination.helper";
+import { userSearchableField } from "./user.const";
 
-const createAdmin = async (req:Request) => {
+const createAdmin = async (req:Request):Promise<Admin> => {
 
-const file = req.file;
+const file = req.file as IFile;
 if (file) {
   const uploadToCloudinary = await fileUploader.uploadToCloudinary(file)
   console.log(uploadToCloudinary,"uploaded");
@@ -31,10 +35,37 @@ if (file) {
     return creataedAdminData;
   });
 
+  return result;
 };
 
-const createDoctor = async (req: any) => {
-  const file = req.file;
+const createDoctor = async (req: Request):Promise<Doctor> => {
+  const file = req.file as IFile;
+  if (file) {
+ 
+    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
+    req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
+    console.log("ekhane");
+  }
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 15);
+  const userPayload = {
+    email: req.body.doctor.email,
+    password: hashedPassword,
+    role: userRole.DOCTOR,
+  };
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.user.create({
+      data: userPayload,
+    });
+    const createDoctorData = await tx.doctor.create({
+      data: req.body.doctor,
+    });
+    return createDoctorData;
+  });
+  return result;
+};
+
+const createPatient = async (req: Request) => {
+  const file = req.file as IFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
     req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
@@ -56,6 +87,89 @@ const createDoctor = async (req: any) => {
   });
   return result;
 };
+const getAllFromDb = async (params:any, options: IOptions) => {
+  const { limit, page, skip } = calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+  const andConditions: Prisma.UserWhereInput[]= [];
+
+  // some code added
+  // [
+  //   {
+  //     name: {
+  //       contains: params.searchTerm,
+  //       mode: "insensitive",
+  //     },
+  //   },
+  //   {
+  //     email: {
+  //       contains: params.searchTerm,
+  //       mode: "insensitive",
+  //     },
+  //   },
+  //   {
+  //     contactNumber: {
+  //       contains: params.searchTerm,
+  //       mode: "insensitive",
+  //     },
+  //   },
+  // ],
+
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: userSearchableField.map((field) => {
+        return {
+          [field]: {
+            contains: params.searchTerm,
+            mode: "insensitive",
+          },
+        };
+      }),
+    });
+  }
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+
+  const whereConditions: Prisma.UserWhereInput = andConditions.length>0? {
+    AND: andConditions,
+  }:{}
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+  const total = await prisma.user.count({
+    where:whereConditions
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+
+    },
+    data:result,
+  };
+};
+
+
+
+
 
 const getMyProfile = async (user: any) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
@@ -150,6 +264,8 @@ const updateMyProfile = async (user:IAuthUser, req:Request) => {
 export const userService = {
   createAdmin,
   createDoctor,
+  createPatient,
+  getAllFromDb,
   getMyProfile,
   updateMyProfile,
 };

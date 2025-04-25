@@ -1,8 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { userService } from "./user.service";
 import sendResponse from "../../../helpers/sendResponse.helper";
 import catchAsync from "../../../helpers/catchAsync";
 import status from "http-status";
+import pick from "../../../shared/pick";
+import { userFilterAbleField } from "./user.const";
 
 // const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
 //   try {
@@ -30,6 +32,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
 
 const createDoctor = catchAsync(async (req: Request, res: Response) => {
+
   const result = await userService.createDoctor(req);
   sendResponse(res, {
     statusCode: status.CREATED,
@@ -40,6 +43,32 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const createPatient = catchAsync(async (req: Request, res: Response) => {
+  const result = await userService.createPatient(req);
+  sendResponse(res, {
+    statusCode: status.CREATED,
+    success: true,
+    message: "Patient created successfully",
+    data: result,
+  });
+});
+
+const getAllUsers = catchAsync(
+  async (req: Request, res: Response) => {
+    const params = pick(req.query, userFilterAbleField);
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
+
+    const result = await userService.getAllFromDb(params, options);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: status.OK,
+      message: " all user data retrived successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
 const user = req.user;
   const result = await userService.getMyProfile(user);
@@ -66,6 +95,8 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   createAdmin,
   createDoctor,
+  createPatient,
+  getAllUsers,
   getMyProfile,
   updateMyProfile
 };
