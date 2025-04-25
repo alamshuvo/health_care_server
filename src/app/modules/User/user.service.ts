@@ -9,6 +9,7 @@ import { IOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/pagination.helper";
 import { userSearchableField } from "./user.const";
 
+
 const createAdmin = async (req:Request):Promise<Admin> => {
 
 const file = req.file as IFile;
@@ -274,6 +275,24 @@ const updateMyProfile = async (user:IAuthUser, req:Request) => {
   }
   return { ...profileInfo };
 };
+
+
+const updateStatus = async(id:string,payload:{status:userStatus})=>{
+  const userExist = await prisma.user.findUniqueOrThrow({
+    where:{
+      id
+    }
+  })
+  const updateUser = await prisma.user.update({
+    where:{
+      id
+    },
+    data:{
+      status:payload.status
+    }
+  })
+  return updateUser
+}
 export const userService = {
   createAdmin,
   createDoctor,
@@ -281,4 +300,5 @@ export const userService = {
   getAllFromDb,
   getMyProfile,
   updateMyProfile,
+  updateStatus
 };

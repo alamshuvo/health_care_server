@@ -45,6 +45,8 @@ router.post(
 );
 
 
+router.patch("/:id/status",auth(userRole.SUPER_ADMIN,userRole.ADMIN),userController.changeProfileStatus)
+
 
 router.patch(
   "/update-my-profile",
