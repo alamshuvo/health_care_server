@@ -24,7 +24,8 @@ const uploadToCloudinary = async (
   file: IFile
 ): Promise<ICloudinaryResponse | undefined> => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(file.path),
+    cloudinary.uploader.upload(
+      file.path,
       (error: Error, result: ICloudinaryResponse) => {
         fs.unlinkSync(file.path);
         if (error) {
@@ -32,7 +33,8 @@ const uploadToCloudinary = async (
         } else {
           resolve(result);
         }
-      };
+      }
+    );
   });
 };
 

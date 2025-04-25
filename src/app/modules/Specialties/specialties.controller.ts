@@ -5,6 +5,7 @@ import status from "http-status";
 import { specialitiesService } from "./specialities.service";
 
 const createSpecialities = catchAsync(async (req: Request, res: Response) => {
+    
   const result = await specialitiesService.createSpecialities(req);
   sendResponse(res, {
     statusCode: status.CREATED,
