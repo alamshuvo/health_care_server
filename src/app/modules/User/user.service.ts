@@ -185,10 +185,10 @@ const getAllFromDb = async (params:any, options: IOptions) => {
 
 
 
-const getMyProfile = async (user: any) => {
+const getMyProfile = async (user: IAuthUser) => {
   const userInfo = await prisma.user.findUniqueOrThrow({
     where: {
-      email: user.email,
+      email: user?.email,
       status: userStatus.ACTIVE,
     },
     select: {

@@ -5,6 +5,7 @@ import catchAsync from "../../../helpers/catchAsync";
 import status from "http-status";
 import pick from "../../../shared/pick";
 import { userFilterAbleField } from "./user.const";
+import { IAuthUser } from "../../interfaces/common";
 
 // const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
 //   try {
@@ -69,9 +70,9 @@ const getAllUsers = catchAsync(
     });
   }
 );
-const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+const getMyProfile = catchAsync(async (req: Request &  {user?:IAuthUser}, res: Response) => {
 const user = req.user;
-  const result = await userService.getMyProfile(user);
+  const result = await userService.getMyProfile(user as IAuthUser);
   sendResponse(res, {
     statusCode: status.CREATED,
     success: true,
@@ -81,9 +82,9 @@ const user = req.user;
 });
 
 
-const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+const updateMyProfile = catchAsync(async (req: Request &{user?:IAuthUser}, res: Response) => {
   const user = req.user;
-    const result = await userService.updateMyProfile(user,req);
+    const result = await userService.updateMyProfile(user as IAuthUser,req);
     sendResponse(res, {
       statusCode: status.CREATED,
       success: true,
