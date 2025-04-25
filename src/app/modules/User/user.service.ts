@@ -1,4 +1,4 @@
-import { Admin, Doctor, Prisma, PrismaClient, userRole, userStatus } from "@prisma/client";
+import { Admin, Doctor, Patient, Prisma, PrismaClient, userRole, userStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
 import { fileUploader } from "../../../helpers/fileUploader";
@@ -65,7 +65,7 @@ const createDoctor = async (req: Request):Promise<Doctor> => {
   return result;
 };
 
-const createPatient = async (req: Request) => {
+const createPatient = async (req: Request):Promise<Patient> => {
   const file = req.file as IFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
@@ -73,16 +73,16 @@ const createPatient = async (req: Request) => {
   }
   const hashedPassword: string = await bcrypt.hash(req.body.password, 15);
   const userPayload = {
-    email: req.body.doctor.email,
+    email: req.body.patient.email,
     password: hashedPassword,
-    role: userRole.DOCTOR,
+    role: userRole.PATIENT,
   };
   const result = await prisma.$transaction(async (tx) => {
     await tx.user.create({
       data: userPayload,
     });
-    const createDoctorData = await tx.doctor.create({
-      data: req.body.doctor,
+    const createDoctorData = await tx.patient.create({
+      data: req.body.patient,
     });
     return createDoctorData;
   });
@@ -240,7 +240,7 @@ const updateMyProfile = async (user:IAuthUser, req:Request) => {
   });
   const file = req.file;
   if (file) {
-    const uploadToCloudinary = await fileUploader.upload(file);
+    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
     req.body.profilePhoto = uploadToCloudinary?.secure_url;
   }
   let profileInfo;
@@ -266,7 +266,7 @@ const updateMyProfile = async (user:IAuthUser, req:Request) => {
       data: req.body
     });
   } else if (isUserExist.role === userRole.PATIENT) {
-    profileInfo = await prisma.admin.update({
+    profileInfo = await prisma.patient.update({
       where: {
         email: isUserExist.email,
       },

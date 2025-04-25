@@ -4,6 +4,7 @@ import auth from "../../middlewares/authMiddleware";
 import { userRole } from "@prisma/client";
 import { fileUploader } from "../../../helpers/fileUploader";
 import { userValidation } from "./user.validation";
+import validateRequest from "../../middlewares/validateRequest";
 
 const router = express.Router();
 
@@ -39,13 +40,13 @@ router.post(
   "/create-patient",
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
-    req.body = userValidation.createDoctor.parse(JSON.parse(req.body.data));
+    req.body = userValidation.createPatient.parse(JSON.parse(req.body.data));
     return userController.createPatient(req, res, next);
   }
 );
 
 
-router.patch("/:id/status",auth(userRole.SUPER_ADMIN,userRole.ADMIN),userController.changeProfileStatus)
+router.patch("/:id/status",auth(userRole.SUPER_ADMIN,userRole.ADMIN),validateRequest(userValidation.updateStatus),userController.changeProfileStatus)
 
 
 router.patch(
