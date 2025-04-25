@@ -152,6 +152,19 @@ const getAllFromDb = async (params:any, options: IOptions) => {
         : {
             createdAt: "desc",
           },
+      select:{
+        id:true,
+        email:true,
+        role:true,
+        needPasswordChange:true,
+        status:true,
+        createdAt:true,
+        updatedAt:true, 
+        admin:true,
+        doctor:true,
+        
+      },
+      
   });
   const total = await prisma.user.count({
     where:whereConditions
