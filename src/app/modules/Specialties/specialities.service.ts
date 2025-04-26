@@ -7,14 +7,12 @@ const createSpecialities = async (req: Request) => {
   const file = req.file as IFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    console.log(uploadToCloudinary);
-    req.body.icon = uploadToCloudinary?.secure_url;
+    req.body.body.icon = uploadToCloudinary?.secure_url;
   }
-  console.log(req.body, "upload to cloudinary tekhe asar por");
   const result = await prisma.specialties.create({
-    data: req.body,
+    data: req.body.body,
   });
-  console.log(result, "result");
+
   return result;
 };
 // set up different 
