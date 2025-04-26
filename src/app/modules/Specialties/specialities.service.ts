@@ -17,7 +17,7 @@ const createSpecialities = async (req: Request) => {
   console.log(result, "result");
   return result;
 };
-
+// set up different 
 const getSpecialities = async () => {
   const result = await prisma.specialties.findMany({});
   return result;
