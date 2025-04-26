@@ -97,6 +97,25 @@ const getAllFromDb = async (params:any, options: IOptions) => {
     };
   };
 
+
+
+   const updateIntoDb = async (id:string, data: any) => {
+    const isDoctorExist = await prisma.doctor.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    })
+    const  result = await prisma.doctor.update({
+      where:{
+        id,
+      },
+      data:{
+        ...data,
+      },
+    })
+    return result
+   }
   export const doctorService ={
-    getAllFromDb
+    getAllFromDb,
+    updateIntoDb
   }
