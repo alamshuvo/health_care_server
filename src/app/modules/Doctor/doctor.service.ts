@@ -111,8 +111,11 @@ const updateIntoDb = async (id: string, data: any) => {
       data: doctorData,
       select:{
         doctorSpecialities:true,
+
+
       }
     });
+    //some ecode added
 
     for (const specilitiesId of specialties) {
       const doctorSpecialities = await tx.doctorSpecialities.create({
