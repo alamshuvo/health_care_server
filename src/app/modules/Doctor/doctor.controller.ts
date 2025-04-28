@@ -23,18 +23,29 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
-const id =req.params.id
-const data = req.body    
-const result = await doctorService.updateIntoDb(id,data);
-sendResponse(res,{
+  const id = req.params.id;
+  const data = req.body;
+  const result = await doctorService.updateIntoDb(id, data);
+  sendResponse(res, {
     statusCode: status.OK,
     success: true,
     message: "Doctor updated successfully",
     data: result,
-})
+  });
+});
 
+const getOneDoctorFromDB = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await doctorService.getOneDoctorFromDB(id);
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: "Single Doctor Retrived successfully",
+    data: result,
+  });
 });
 export const doctorController = {
   getAllFromDB,
   updateIntoDB,
+  getOneDoctorFromDB
 };

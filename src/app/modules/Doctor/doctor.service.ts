@@ -79,7 +79,11 @@ const getAllFromDb = async (params: any, options: IOptions) => {
       email: true,
       createdAt: true,
       updatedAt: true,
-      doctorSpecialities: true,
+      doctorSpecialities: {
+        include:{
+          speciality:true,
+        }
+      },
     },
   });
   const total = await prisma.doctor.count({
@@ -157,7 +161,22 @@ const updateIntoDb = async (id: string, data: any) => {
   });
   return result;
 };
+
+const getOneDoctorFromDB = async (id:string)=>{
+  const result = await prisma.doctor.findUniqueOrThrow({
+    where:{
+      id
+    }
+  })
+  return result
+}
+
+
+
+
+
 export const doctorService = {
   getAllFromDb,
   updateIntoDb,
+  getOneDoctorFromDB
 };
