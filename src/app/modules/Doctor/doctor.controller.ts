@@ -5,7 +5,6 @@ import { doctorFilterableFields } from "./doctor.const";
 import sendResponse from "../../../helpers/sendResponse.helper";
 import status from "http-status";
 import { doctorService } from "./doctor.service";
-import { send } from "process";
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, doctorFilterableFields);
