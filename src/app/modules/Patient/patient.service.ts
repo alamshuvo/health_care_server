@@ -88,7 +88,16 @@ const getAllFromDb = async (params:any, options: IOptions) => {
           updatedAt:true, 
           patientHealthData:true,
           medicalReport:true,
-          user:true
+          profilePhoto:true,
+          user:{
+            select:{
+                email:true,
+                role:true,
+                status:true,
+                needPasswordChange:true,
+                
+            }
+          }
         },
         
     });
@@ -105,9 +114,17 @@ const getAllFromDb = async (params:any, options: IOptions) => {
       data:result,
     };
   };
-
+  const getOnePatientFromDB = async(id:string)=>{
+  const isPatientExist = await prisma.patient.findUniqueOrThrow({
+    where:{
+        id
+    }
+  })
+  return isPatientExist
+  }
 
 
   export const patientService = {
     getAllFromDb,
+    getOnePatientFromDB
   }
