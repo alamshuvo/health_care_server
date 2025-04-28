@@ -32,7 +32,19 @@ const getOnePatientFromDB = catchAsync(async(req:Request,res:Response)=>{
         data:result
     })
 })
+
+const updatePatient = catchAsync(async(req:Request,res:Response)=>{
+    const id = req.params.id;
+    const result = await patientService.updatePatient(id,req.body);
+    sendResponse(res,{
+        statusCode:status.OK,
+        success:true,
+        message:"Single Patient data updatead  successfully",
+        data:result
+    })
+})
 export const patientController = {
   getAllFromDB,
-  getOnePatientFromDB
+  getOnePatientFromDB,
+  updatePatient
 };
