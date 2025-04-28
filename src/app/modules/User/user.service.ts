@@ -69,7 +69,7 @@ const createPatient = async (req: Request):Promise<Patient> => {
   const file = req.file as IFile;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
+    req.body.profilePhoto = uploadToCloudinary?.secure_url;
   }
   const hashedPassword: string = await bcrypt.hash(req.body.password, 15);
   const userPayload = {
