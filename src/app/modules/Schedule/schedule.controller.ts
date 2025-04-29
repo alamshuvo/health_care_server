@@ -14,7 +14,7 @@ const insertIntoDb = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
       statusCode: status.OK,
       success: true,
-      message: "patient retrieval successfully",
+      message: "schedul data create successfully",
       data:result
     });
   });
