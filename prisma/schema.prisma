@@ -57,6 +57,7 @@ model Doctor {
   user                User                 @relation(fields: [email], references: [email])
   doctorSpecialities  DoctorSpecialities[]
   doctorSchedule      doctorSchedule[]
+  appointment         Appointment[]
 
   @@map("doctors")
 }
@@ -75,6 +76,7 @@ model Patient {
   user              User               @relation(fields: [email], references: [email])
   patientHealthData patientHealthData?
   medicalReport     medicalReport[]
+  appointment       Appointment[]
 
   @@map("patients")
 }
@@ -138,25 +140,57 @@ model medicalReport {
 
 model Schedule {
   id             String           @id @default(uuid())
-  startDateTime      DateTime
-  endDateTime        DateTime
+  startDateTime  DateTime
+  endDateTime    DateTime
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   doctorSchedule doctorSchedule[]
+  appointment    Appointment?
 
   @@map("schedule")
 }
 
 model doctorSchedule {
   doctorId      String
-  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+  doctor        Doctor       @relation(fields: [doctorId], references: [id])
   scheduleId    String
-  schedule      Schedule @relation(fields: [scheduleId], references: [id])
-  isBooked      Boolean @default(false)
-  appointmentId String?
+  schedule      Schedule     @relation(fields: [scheduleId], references: [id])
+  isBooked      Boolean      @default(false)
+  appointmentId String?      @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
 
   @@id([doctorId, scheduleId])
   @@map("doctro_schedule")
+}
+
+model Appointment {
+  id             String            @id @default(uuid())
+  patientId      String
+  patient        Patient           @relation(fields: [patientId], references: [id])
+  doctorId       String
+  doctor         Doctor            @relation(fields: [doctorId], references: [id])
+  scheduleId     String            @unique
+  schedule       Schedule          @relation(fields: [scheduleId], references: [id])
+  vedioCallingId String
+  status         appointmentStatus @default(SCHEDULED)
+  paymentStatus  paymentStatus     @default(UNPAID)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  doctorSchedule doctorSchedule?
+
+  @@map("appointment")
+}
+
+enum paymentStatus {
+  PAID
+  UNPAID
+}
+
+enum appointmentStatus {
+  SCHEDULED
+  INPROGRESS
+  COMPLETED
+  CANCELED
 }
 
 enum martialStatus {
