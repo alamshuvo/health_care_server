@@ -1,9 +1,10 @@
 import { addHours, addMinutes, format } from "date-fns";
 import { prisma } from "../../../shared/prisma";
 import { Prisma, Schedule } from "@prisma/client";
-import { ISchedule } from "./schedule.interface";
+import { IFilterRequest, ISchedule } from "./schedule.interface";
 import { IOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/pagination.helper";
+import { IAuthUser } from "../../interfaces/common";
 const insertIntoDb = async (payload: ISchedule):Promise<Schedule[]> => {
   const { startDate, endDate, startTime, endTime } = payload;
   const curentDate = new Date(startDate); // start Date
@@ -58,11 +59,26 @@ const insertIntoDb = async (payload: ISchedule):Promise<Schedule[]> => {
   return schedule;
 };
 
-const getAllFormDB = async (params: any, options: IOptions) => {
+const getAllFormDB = async (params: any, options: IOptions,user:IAuthUser) => {
   const { limit, page, skip } = calculatePagination(options);
-  const { searchTerm, specialties, ...filterData } = params;
+  const { startDateTime,endDateTime, ...filterData } = params;
   const andConditions: Prisma.ScheduleWhereInput[] = [];
-
+if (startDateTime && endDateTime) {
+  andConditions.push({
+    AND:[
+      {
+        startDateTime:{
+          gte:startDateTime
+        }
+      },
+      {
+        endDateTime:{
+          lte:endDateTime
+        }
+      }
+    ]
+  })
+}
   // some code added
   // [
   //   {
@@ -114,8 +130,25 @@ const getAllFormDB = async (params: any, options: IOptions) => {
           AND: andConditions,
         }
       : {};
+
+const doctorSchedules = await prisma.doctorSchedule.findMany({
+  where:{
+    doctor:{
+      email:user?.email
+    }
+  }
+})
+
+const doctorScheduleIDS = doctorSchedules.map(schedule=>schedule.scheduleId);
+
+
   const result = await prisma.schedule.findMany({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      id:{
+        notIn:doctorScheduleIDS
+      }
+    },
     skip,
     take: limit,
     orderBy:
@@ -128,9 +161,10 @@ const getAllFormDB = async (params: any, options: IOptions) => {
           },
     select: {
       id: true,
-     
       createdAt: true,
       updatedAt: true,
+      startDateTime:true,
+      endDateTime:true
     
    
       

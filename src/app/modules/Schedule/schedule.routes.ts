@@ -9,6 +9,6 @@ route.post(
   auth(userRole.SUPER_ADMIN, userRole.ADMIN),
   scheduleController.insertIntoDb
 );
-route.get("/", scheduleController.getAllFromDB);
+route.get("/",auth(userRole.DOCTOR), scheduleController.getAllFromDB);
 
 export const scheduleRoutes = route;
