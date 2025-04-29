@@ -1,8 +1,9 @@
-import { Prisma } from "@prisma/client";
+import { Patient, Prisma, userStatus } from "@prisma/client";
 import { calculatePagination } from "../../../helpers/pagination.helper";
 import { IOptions } from "../../interfaces/pagination";
 import { prisma } from "../../../shared/prisma";
 import { patientSearchableField } from "./patient.const";
+import { IPatientUpdate } from "./patient.interface";
 
 const getAllFromDb = async (params: any, options: IOptions) => {
   const { limit, page, skip } = calculatePagination(options);
@@ -128,7 +129,10 @@ const getOnePatientFromDB = async (id: string) => {
   return isPatientExist;
 };
 
-const updatePatient = async (id: string, data: any) => {
+const updatePatient = async (
+  id: string,
+  data: Partial<IPatientUpdate>
+): Promise<Patient | null> => {
   const { patientHealthData, medicalReport, ...patientData } = data;
 
   const isPatientExist = await prisma.patient.findUniqueOrThrow({
@@ -184,8 +188,66 @@ const updatePatient = async (id: string, data: any) => {
   });
   return responseResult;
 };
+const deleteFromDB = async (id: string):Promise<Patient| null> => {
+  const isPatientExist = await prisma.patient.findUniqueOrThrow({
+    where: { id },
+  });
+
+  // transation delete
+  const result = await prisma.$transaction(async (tx) => {
+    //delete medical report
+    await tx.medicalReport.deleteMany({
+      where: {
+        patientId: isPatientExist.id,
+      },
+    });
+    //delete helathData
+    await tx.patientHealthData.delete({
+      where: {
+        patientId: isPatientExist.id,
+      },
+    });
+    // delete patient
+    const deletedPatient = await tx.patient.delete({
+      where: { id },
+    });
+    // delete user
+    await tx.user.delete({
+      where: {
+        email: isPatientExist.email,
+      },
+    });
+    return deletedPatient;
+  });
+  return result;
+};
+
+const softDelete = async (id: string):Promise<Patient | null> => {
+  return await prisma.$transaction(async (tx) => {
+    const deletedPatient = await tx.patient.update({
+      where: {
+        id: id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+    await tx.user.update({
+      where: {
+        email: deletedPatient.email,
+      },
+      data: {
+        status: userStatus.DELETED,
+      },
+    });
+    return deletedPatient;
+  });
+};
+
 export const patientService = {
   getAllFromDb,
   getOnePatientFromDB,
   updatePatient,
+  deleteFromDB,
+  softDelete,
 };
