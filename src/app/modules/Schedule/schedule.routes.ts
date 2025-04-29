@@ -1,7 +1,11 @@
 import express from 'express'
 import { scheduleController } from './schedule.controller';
+import auth from '../../middlewares/authMiddleware';
+import { userRole } from '@prisma/client';
 const route  = express.Router();
 
-route.post("/",scheduleController.insertIntoDb)
+route.post("/",
+    auth(userRole.SUPER_ADMIN,userRole.ADMIN),
+    scheduleController.insertIntoDb)
 
 export const scheduleRoutes =  route

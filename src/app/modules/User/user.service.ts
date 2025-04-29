@@ -45,7 +45,7 @@ const createDoctor = async (req: Request):Promise<Doctor> => {
  
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
     req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url;
-    console.log("ekhane");
+    
   }
   const hashedPassword: string = await bcrypt.hash(req.body.password, 15);
   const userPayload = {
@@ -53,6 +53,7 @@ const createDoctor = async (req: Request):Promise<Doctor> => {
     password: hashedPassword,
     role: userRole.DOCTOR,
   };
+ 
   const result = await prisma.$transaction(async (tx) => {
     await tx.user.create({
       data: userPayload,

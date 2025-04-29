@@ -1,24 +1,32 @@
 import { addHours, addMinutes, format } from "date-fns";
 import { prisma } from "../../../shared/prisma";
-const insertIntoDb = async (payload: any) => {
+import { Schedule } from "@prisma/client";
+import { ISchedule } from "./schedule.interface";
+const insertIntoDb = async (payload: ISchedule):Promise<Schedule[]> => {
   const { startDate, endDate, startTime, endTime } = payload;
   const curentDate = new Date(startDate); // start Date
   const LastDate = new Date(endDate); // end Date
 
   const interValTime = 30;
-  const schedule =[];
+  const schedule = [];
   while (curentDate <= LastDate) {
     const startDateTime = new Date(
-      addHours(
-        `${format(curentDate, "yyyy-MM-dd")}`,
-        Number(startTime.split(":")[0])
+      addMinutes(
+        addHours(
+          `${format(curentDate, "yyyy-MM-dd")}`,
+          Number(startTime.split(":")[0])
+        ),
+        Number(startTime.split(":")[1])
       )
     );
 
     const endDateTime = new Date(
-      addHours(
-        `${format(curentDate, "yyyy-MM-dd")}`,
-        Number(endTime.split(":")[0])
+      addMinutes(
+        addHours(
+          `${format(curentDate, "yyyy-MM-dd")}`,
+          Number(endTime.split(":")[0])
+        ),
+        Number(endTime.split(":")[1])
       )
     );
     while (startDateTime < endDateTime) {
@@ -26,18 +34,26 @@ const insertIntoDb = async (payload: any) => {
         startDateTime: startDateTime,
         endDateTime: addMinutes(startDateTime, interValTime),
       };
-      const result = await prisma.schedule.create({
-        data:scheduleData
+
+      const existingSchedule = await prisma.schedule.findFirst({
+        where:{
+            startDateTime:scheduleData.startDateTime,
+            endDateTime:scheduleData.endDateTime
+        }
       })
-
-      schedule.push(result)
-      startDateTime.setMinutes(startDateTime.getMinutes()+interValTime)
-    }
+     if (!existingSchedule) {
+        const result = await prisma.schedule.create({
+            data: scheduleData,
+          });
     
-    curentDate.setDate(curentDate.getDate()+1);
+          schedule.push(result);
+     }
+      startDateTime.setMinutes(startDateTime.getMinutes() + interValTime);
+    }
 
+    curentDate.setDate(curentDate.getDate() + 1);
   }
-  return schedule
+  return schedule;
 };
 
 export const scheduleService = {
