@@ -3,6 +3,7 @@ import catchAsync from "../../../helpers/catchAsync";
 import sendResponse from "../../../helpers/sendResponse.helper";
 import { scheduleService } from "./schedule.service";
 import status from "http-status";
+import pick from "../../../shared/pick";
 
 const insertIntoDb = catchAsync(async (req: Request, res: Response) => {
     // const filters = pick(req.query, patientFilterableFields);
@@ -19,7 +20,24 @@ const insertIntoDb = catchAsync(async (req: Request, res: Response) => {
     });
   });
 
+
+  const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+    const filters = pick(req.query, ["startDateTime","endDateTime"]);
+  
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  
+    const result = await scheduleService.getAllFormDB(filters,options);
+  
+    sendResponse(res, {
+      statusCode: status.OK,
+      success: true,
+      message: "schedul data retrived  successfully",
+      data:result
+    });
+  });
+
   export const scheduleController = {
-    insertIntoDb
+    insertIntoDb,
+    getAllFromDB
   }
   
