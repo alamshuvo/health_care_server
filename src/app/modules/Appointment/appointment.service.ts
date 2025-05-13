@@ -146,7 +146,13 @@ const getAppointment = async (
     };
   }
 };
+
+
+const changeAppointmentStatus = async()=>{
+
+}
 export const appointmentService = {
   createAppointment,
   getAppointment,
+  changeAppointmentStatus
 };

@@ -23,7 +23,7 @@ const initPayment = async (appointmentId: string) => {
     address: paymentData?.appointment.patient.address,
     contactNumber: paymentData?.appointment.patient.contactNumber,
   };
-  const result = await sslService.initPayment(initPaymentData as IPaymentData);
+  const result = await sslService.initPayment(initPaymentData);
 
   return {
     paymentURL: result,
