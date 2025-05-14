@@ -4,6 +4,7 @@ import { IPaymentData } from "../SSL/ssl.interface";
 import { sslService } from "../SSL/ssl.service";
 import { paymentStatus } from "@prisma/client";
 const initPayment = async (appointmentId: string) => {
+  console.log(appointmentId);
   const paymentData = await prisma.payment.findFirstOrThrow({
     where: { appointmentId },
     include: {
