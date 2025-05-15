@@ -11,6 +11,7 @@ import { appointmentRoutes } from "../modules/Appointment/appointment.routes";
 import { paymentRoutes } from "../modules/payment/payment.routes";
 import { PrescriptionRoutes } from "../modules/Prescription/prescription.route";
 import { ReviewRoutes } from "../modules/Review/review.route";
+import { MetaRoutes } from "../modules/Meta/meta.routes";
 const router = express.Router();
 
 const moduleRoutes = [
@@ -59,9 +60,13 @@ const moduleRoutes = [
     route: PrescriptionRoutes,
   },
   {
-    path:"/review",
-    route:ReviewRoutes
-  }
+    path: "/review",
+    route: ReviewRoutes,
+  },
+  {
+    path: "/meta",
+    route: MetaRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => {
