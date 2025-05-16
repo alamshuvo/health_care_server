@@ -51,6 +51,7 @@ const initPayment = async (paymentData: IPaymentData) => {
     throw new ApiError(status.BAD_REQUEST, "Payment error occured");
   }
 };
+//some code added 
 const validatePayment = async (payload: any) => {
   try {
     const response = await axios({
