@@ -5,6 +5,10 @@ import { IFilterRequest, ISchedule } from "./schedule.interface";
 import { IOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/pagination.helper";
 import { IAuthUser } from "../../interfaces/common";
+const convertedTime = async(date:Date)=>{ 
+const offset = date.getTimezoneOffset() * 60000;
+return new Date(date.getTime()+offset)
+}
 const insertIntoDb = async (payload: ISchedule):Promise<Schedule[]> => {
   const { startDate, endDate, startTime, endTime } = payload;
   const curentDate = new Date(startDate); // start Date
@@ -33,9 +37,15 @@ const insertIntoDb = async (payload: ISchedule):Promise<Schedule[]> => {
       )
     );
     while (startDateTime < endDateTime) {
+      // const scheduleData = {
+      //   startDateTime: startDateTime,
+      //   endDateTime: addMinutes(startDateTime, interValTime),
+      // };
+      const startDateTimes = await convertedTime(startDateTime)
+      const endDateTimes = await convertedTime(addMinutes(startDateTime, interValTime))
       const scheduleData = {
-        startDateTime: startDateTime,
-        endDateTime: addMinutes(startDateTime, interValTime),
+        startDateTime: startDateTimes,
+        endDateTime: endDateTimes,
       };
 
       const existingSchedule = await prisma.schedule.findFirst({
